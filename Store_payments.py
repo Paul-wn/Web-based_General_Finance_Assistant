@@ -27,7 +27,7 @@ password = "mypassword"
 port = 5432
 conn = None
 cur = None
-value = clean_data('receipt.jpg')
+value = clean_data('image/receipt.jpg')
 try:
     conn = psycopg2.connect(
         host="localhost",       # หรือชื่อ container ถ้าอยู่ใน docker เดียวกัน
@@ -38,10 +38,20 @@ try:
     )
     
     cur = conn.cursor() 
-    insert_script = "INSERT INTO payments (date, time, amount) VALUES (%s, %s, %s);"
-    cur.execute(insert_script, (value['date'], value['time'], value['amount']))
+    # insert_script = "INSERT INTO payments (date, time, amount) VALUES (%s, %s, %s);"
+    select_script = '''SELECT date, amount, "time", id, name FROM public.payments;'''
+    # cur.execute(select_script)
 
-    conn.commit()
+    cur.execute(select_script)
+    print("Selecting rows from mobile table using cursor.fetchall")
+    mobile_records = cur.fetchall()
+
+    print("Print each row and it's columns values")
+    for row in mobile_records:
+        print("Id = ", row[3], )
+
+
+    # conn.commit()
 except Exception as error:
     print(error)
 finally:
